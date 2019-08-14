@@ -3,7 +3,7 @@
     <div class="header">
       <img class="logo" src="../assets/logo.png" />
       <div class="align-left">
-        <span id="nombre">Bienvenido/a {{Nombre}}</span>
+        <span id="nombre">Bienvenido/a {{usuario.usuario}}</span>
         <img class="avatar" src="../assets/avatar.svg" />
       </div>
     </div>
@@ -12,17 +12,26 @@
         <h1 class="tu-cuenta">Tu cuenta</h1>
         <button class="links" @click="extraerDinero()">Extraer dinero</button>
         <button class="links" @click="depositarDinero()">Depositar dinero</button>
-        <button class="links" @click="pagarServicio()">Pagar servicios</button>
+        <button class="links" @click="mostrar ++">Pagar Servicio</button>
+        <span v-if="mostrar %2">
+          <div>
+            <button class="links" v-for="servicio in servicios" @click="pagarServicio(servicio)">
+              <!-- en el v-for podemos seleccionar el servicio q se selecciono con un parametro llamado servicio -->
+              <small>{{servicio.serv}}</small>
+            </button>
+          </div>
+        </span>
+
         <button class="links" @click="transferirDinero()">Transferir dinero</button>
         <button class="links" @click="cambiarLimiteDeExtraccion()">Cambiar límite de extracción</button>
       </div>
       <div class="green-container">
         <div class="cuenta-info">
           <p>Saldo en tu cuenta</p>
-          <h3 id="saldo-cuenta">${{Saldo}}</h3>
+          <h3 id="saldo-cuenta">${{usuario.saldo}}</h3>
           <p id="limite-extraccion">
             Tu límite de extracción es:
-            ${{LimiteDeExtraccion}}
+            ${{usuario.limite}}
           </p>
         </div>
       </div>
@@ -31,54 +40,81 @@
 </template>
 
 <script>
+import { async } from "q";
 export default {
   name: "Cajero",
+  props: ["usuario"],
   data() {
     return {
       auth: false,
-      Saldo: 40000,
-      LimiteDeExtraccion: 5000,
-      Nombre: "GASTON CAMAÑO",
-      Servicios: [
-        { name: "Factura telefonica" },
-        { name: "Luz" },
-        { name: "Gas" }
-      ]
+      mostrar: 2,
+      //Saldo: 40000,
+      //LimiteDeExtraccion: 5000,
+      //Nombre: "GASTON CAMAÑO",
+      servicios: []
     };
   },
   mounted() {
-    this.validar();
-    this.ingresarNombre();
+    this.loadServicios();
   },
+  //this.validar();
+  //this.ingresarNombre();
+
   methods: {
-    validar() {
-      let txt = prompt("Ingrese la clave:");
-      if (txt == null || txt == "") {
-        // "User cancelled the prompt."
-        this.validar();
-      } else {
-        let pass = parseInt(txt);
-        if (parseInt(pass) === 1122) {
-          this.auth = true;
-        }
+    loadServicios: async function() {
+      try {
+        const data = await fetch("./servicios.json");
+        this.servicios = await data.json();
+      } catch (error) {
+        throw error;
       }
     },
-    ingresarNombre() {
-      let txt = prompt("Ingrese nombre y apellido");
-      let usuario = txt;
-      if (usuario) {
-        this.Nombre = usuario;
+
+    //validar() {
+    // let txt = prompt("Ingrese la clave:");
+    // if (txt == null || txt == "") nulo o vacio {
+    // "User cancelled the prompt."
+    //   this.validar();
+    // } else {
+    // let pass = parseInt(txt);
+    // if (parseInt(pass) === 1122) {
+    //  this.auth = true;
+    // }
+    //}
+    //},
+    // ingresarNombre() {
+    // let txt = prompt("Ingrese nombre y apellido");
+    // let usuario = txt;
+    // if (usuario) {
+    //  this.Nombre = usuario;
+    // }
+    // },
+    pagarServicio(servicio) {
+      // SE PUEDE PASAR POR PARAMETRO EL SERVICIO AL Q ESTOY ACCEDIENDO ..ASI ME AHORRO CODIGO
+      alert(servicio.serv);
+      //cuando se pasa por parametro no se le pone el this
+      let total = servicio.monto;
+      let minimo = servicio.montoMinimo;
+      //para mostrar en un promp una variable se usa $${   }
+      const servicios = `Indique cuanto quiere pagar:
+      1 - Pago total $${total}
+      2 - Pago minimo $${minimo}`;
+
+      const idServicio = prompt(servicios);
+      if (parseInt(idServicio)) {
+        this.usuario.saldo = this.usuario.saldo - idServicio;
       }
     },
+
     extraerDinero() {
       const txt = prompt("Ingrese dinero a extraer:");
       console.log(txt);
       let extraer = parseInt(txt);
       if (
-        parseInt(extraer) < this.Saldo &&
-        parseInt(extraer) <= this.LimiteDeExtraccion
+        parseInt(extraer) < this.usuario.saldo &&
+        parseInt(extraer) <= this.usuario.limite
       ) {
-        this.Saldo = this.Saldo - extraer;
+        this.usuario.saldo = this.usuario.saldo - extraer;
       } else {
         alert("No puedes retirar ese monto");
       }
@@ -87,14 +123,14 @@ export default {
       const txt = prompt("Ingrese dinero a depositar:");
       let depositar = parseInt(txt);
       if (parseInt(depositar)) {
-        this.Saldo = this.Saldo + depositar;
+        this.usuario.saldo = this.usuario.saldo + depositar;
       }
     },
     cambiarLimiteDeExtraccion() {
       const txt = prompt("Cambiar limite:");
       let cambiar = parseInt(txt);
       if (parseInt(cambiar) <= 12000) {
-        this.LimiteDeExtraccion = cambiar;
+        this.usuario.limite = cambiar;
       } else {
         alert("no es posible cambiarlo");
       }

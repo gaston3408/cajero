@@ -1,0 +1,6 @@
+[
+{"usuario":"Juan Perez","contraseña":2222,"saldo":30000,"limite":5000},
+{"usuario":"Gaston Camaño","contraseña":3333,"saldo":100000,"limite":5000},
+{"usuario":"Pedro Gomez","contraseña":4444,"saldo":55000,"limite":3000},
+{"usuario":"Alfredo Camaño","contraseña":5555,"saldo":66000,"limite":4000}
+]

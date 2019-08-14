@@ -1,0 +1,6 @@
+[
+{"serv": "luz", "monto":4000, "montoMinimo": 0},
+{"serv" : "tarjeta Visa","monto":7000,"montoMinimo":2500},
+{"serv" :"tarjeta MasterCard","monto": 10000 , "montoMinimo": 3000}
+
+]
