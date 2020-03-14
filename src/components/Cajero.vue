@@ -15,7 +15,7 @@
         <button class="links" @click="mostrar ++">Pagar Servicio</button>
         <span v-if="mostrar %2">
           <div>
-            <button class="links" v-for="servicio in servicios" @click="pagarServicio(servicio)">
+            <button class="links" v-for="servicio in servicios" @click="pagarServicio(servicio)" :key="servicio.id">
               <!-- en el v-for podemos seleccionar el servicio q se selecciono con un parametro llamado servicio -->
               <small>{{servicio.serv}}</small>
             </button>
@@ -91,7 +91,7 @@ export default {
     // },
     pagarServicio(servicio) {
       // SE PUEDE PASAR POR PARAMETRO EL SERVICIO AL Q ESTOY ACCEDIENDO ..ASI ME AHORRO CODIGO
-      alert(servicio.serv);
+    
       //cuando se pasa por parametro no se le pone el this
       let total = servicio.monto;
       let minimo = servicio.montoMinimo;
@@ -110,6 +110,7 @@ export default {
       const txt = prompt("Ingrese dinero a extraer:");
       console.log(txt);
       let extraer = parseInt(txt);
+     // parseInt lo convierte a numero entero && parseFloat lo convierte en numero decimal
       if (
         parseInt(extraer) < this.usuario.saldo &&
         parseInt(extraer) <= this.usuario.limite
